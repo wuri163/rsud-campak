@@ -760,7 +760,11 @@ function renderGenderChart() {
       cutout: '65%',
       plugins: {
         datalabels: {
-          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          display: (ctx) => {
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            const value = ctx.dataset.data[ctx.dataIndex];
+            return total > 0 && (value / total * 100) >= 3;
+          },
           color: '#fff',
           font: { weight: 'bold', size: 10 },
           formatter: (value, ctx) => {
@@ -830,7 +834,11 @@ function renderKlasifikasiChart() {
       cutout: '60%',
       plugins: {
         datalabels: {
-          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          display: (ctx) => {
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            const value = ctx.dataset.data[ctx.dataIndex];
+            return total > 0 && (value / total * 100) >= 3;
+          },
           color: '#fff',
           font: { weight: 'bold', size: 10 },
           formatter: (value, ctx) => {
@@ -908,7 +916,11 @@ function renderImunisasiChart() {
       cutout: '60%',
       plugins: {
         datalabels: {
-          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          display: (ctx) => {
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            const value = ctx.dataset.data[ctx.dataIndex];
+            return total > 0 && (value / total * 100) >= 3;
+          },
           color: '#fff',
           font: { weight: 'bold', size: 10 },
           formatter: (value, ctx) => {
