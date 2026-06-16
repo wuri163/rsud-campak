@@ -1083,5 +1083,105 @@ function exportCSV() {
   URL.revokeObjectURL(url);
 }
 
+// === Copy Prompt to AI Agent ===
+function initCopyPromptButtons() {
+  const buttons = document.querySelectorAll('.btn-copy-prompt');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const chartKey = btn.getAttribute('data-chart');
+      const chartName = btn.getAttribute('data-name');
+      
+      const chart = charts[chartKey];
+      if (!chart) {
+        alert('Data grafik belum siap.');
+        return;
+      }
+      
+      // Get current date range filter values (if any)
+      const dateStartEl = document.getElementById('filterStartDate');
+      const dateEndEl = document.getElementById('filterEndDate');
+      const dateRangeText = (dateStartEl && dateStartEl.value && dateEndEl && dateEndEl.value) 
+        ? `${dateStartEl.value} s.d. ${dateEndEl.value}` 
+        : 'Seluruh Periode';
+
+      // Gather current filter selections to add context to prompt
+      const kabEl = document.getElementById('filterKabupaten');
+      const kabText = kabEl ? kabEl.value || 'Semua' : 'Semua';
+      
+      const dataJSON = getChartDataJSON(chartKey);
+      
+      const promptText = `Anda adalah seorang Epidemiolog Senior dan Spesialis Surveilans Penyakit.
+Berikut adalah data ${chartName} dari Dashboard Surveilans Campak/Rubella berdasarkan Data Kunjungan Pasien RSUD Dr. Soedarso:
+
+Konteks Filter Aktif:
+- Rentang Tanggal: ${dateRangeText}
+- Kabupaten/Kota: ${kabText}
+
+Data (Format JSON):
+${JSON.stringify(dataJSON, null, 2)}
+
+Tugas Anda:
+1. Buatlah analisis deskriptif naratif dari data di atas (identifikasi tren, pola, puncak kasus, atau kelompok berisiko tinggi).
+2. Berikan interpretasi epidemiologis sesuai aspek Orang/Tempat/Waktu.
+3. Berikan rekomendasi intervensi kesehatan masyarakat berbasis bukti (Evidence-Based Decision Making).`;
+
+      navigator.clipboard.writeText(promptText).then(() => {
+        // Visual feedback
+        const span = btn.querySelector('span');
+        const originalIcon = btn.innerHTML;
+        
+        btn.classList.add('copied');
+        btn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-copied"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Copied!</span>
+        `;
+        
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = originalIcon;
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        alert('Gagal menyalin prompt.');
+      });
+    });
+  });
+}
+
+function getChartDataJSON(chartKey) {
+  const chart = charts[chartKey];
+  if (!chart) return [];
+  
+  const labels = chart.data.labels;
+  const datasets = chart.data.datasets;
+  
+  return labels.map((label, index) => {
+    const row = {};
+    if (chartKey === 'epiCurve') {
+      row["Minggu Epidemiologi"] = label;
+    } else if (chartKey === 'kabupaten') {
+      row["Kabupaten"] = label;
+    } else if (chartKey === 'umur') {
+      row["Kelompok Umur"] = label;
+    } else if (chartKey === 'gender') {
+      row["Jenis Kelamin"] = label;
+    } else if (chartKey === 'klasifikasi') {
+      row["Klasifikasi Akhir"] = label;
+    } else if (chartKey === 'imunisasi') {
+      row["Status Imunisasi"] = label;
+    } else {
+      row["Kategori"] = label;
+    }
+    
+    datasets.forEach(ds => {
+      row[ds.label || 'Jumlah'] = ds.data[index];
+    });
+    return row;
+  });
+}
+
 // === Initialize ===
-document.addEventListener('DOMContentLoaded', fetchData);
+document.addEventListener('DOMContentLoaded', () => {
+  fetchData();
+  initCopyPromptButtons();
+});

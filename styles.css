@@ -545,13 +545,58 @@ body::before {
   margin-bottom: var(--space-md);
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.chart-title .title-text {
+  display: flex;
+  align-items: center;
   gap: var(--space-sm);
 }
 
-.chart-title svg {
+.chart-title .title-text svg {
   width: 18px;
   height: 18px;
   color: var(--accent-teal);
+}
+
+.btn-copy-prompt {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-copy-prompt:hover {
+  background: rgba(20, 184, 166, 0.1);
+  border-color: rgba(20, 184, 166, 0.3);
+  color: var(--accent-teal);
+  transform: translateY(-1px);
+}
+
+.btn-copy-prompt:active {
+  transform: translateY(0);
+}
+
+.btn-copy-prompt svg {
+  color: inherit !important;
+  width: 12px;
+  height: 12px;
+}
+
+.btn-copy-prompt.copied {
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: var(--accent-green);
 }
 
 .chart-container {
