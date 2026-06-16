@@ -105,11 +105,11 @@ function parseCSV(text) {
 function processRow(row) {
   if (!row || row.length < 45) return null;
 
-  const no = row[COL.NO];
-  if (!no || isNaN(parseInt(no))) return null;
-
   const nama = row[COL.NAMA];
-  if (!nama || nama === '') return null;
+  if (!nama || nama.trim() === '') return null;
+
+  const noRaw = row[COL.NO];
+  const no = (noRaw && !isNaN(parseInt(noRaw))) ? parseInt(noRaw) : '-';
 
   const genderRaw = (row[COL.GENDER] || '').toUpperCase().trim();
   const gender = genderRaw === 'L' || genderRaw === 'P' ? genderRaw : '?';
@@ -130,7 +130,7 @@ function processRow(row) {
   const mcv1 = (row[COL.MCV1] || '').trim().toLowerCase();
 
   return {
-    no: parseInt(no),
+    no,
     nama: capitalize(nama),
     gender,
     umurTahun,
@@ -898,8 +898,10 @@ function getDisplayCases() {
         case 10: va = a.kondisi; vb = b.kondisi; break;
         default: va = ''; vb = '';
       }
-      if (typeof va === 'number') {
-        return sortDirection === 'asc' ? va - vb : vb - va;
+      const numA = Number(va);
+      const numB = Number(vb);
+      if (!isNaN(numA) && !isNaN(numB)) {
+        return sortDirection === 'asc' ? numA - numB : numB - numA;
       }
       va = String(va).toLowerCase();
       vb = String(vb).toLowerCase();
