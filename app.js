@@ -1100,11 +1100,46 @@ function initCopyPromptButtons() {
       }
       
       // Get current date range filter values (if any)
-      const dateStartEl = document.getElementById('filterStartDate');
-      const dateEndEl = document.getElementById('filterEndDate');
-      const dateRangeText = (dateStartEl && dateStartEl.value && dateEndEl && dateEndEl.value) 
-        ? `${dateStartEl.value} s.d. ${dateEndEl.value}` 
-        : 'Seluruh Periode';
+      const dateStartEl = document.getElementById('filterDateFrom');
+      const dateEndEl = document.getElementById('filterDateTo');
+      
+      let dateRangeText = 'Seluruh Periode';
+      
+      function formatDateToIndo(date) {
+        if (!date || isNaN(date.getTime())) return '-';
+        const months = [
+          'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+          'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+      }
+
+      function formatISODateToIndo(isoStr) {
+        if (!isoStr) return '-';
+        const parts = isoStr.split('-');
+        if (parts.length === 3) {
+          const year = parseInt(parts[0]);
+          const month = parseInt(parts[1]) - 1;
+          const day = parseInt(parts[2]);
+          const d = new Date(year, month, day);
+          return formatDateToIndo(d);
+        }
+        return isoStr;
+      }
+
+      if (dateStartEl && dateStartEl.value && dateEndEl && dateEndEl.value) {
+        dateRangeText = `${formatISODateToIndo(dateStartEl.value)} s.d. ${formatISODateToIndo(dateEndEl.value)}`;
+      } else {
+        // Fallback to min and max dates of the current filtered cases
+        if (filteredCases.length > 0) {
+          const dates = filteredCases.map(c => parseDate(c.tglLapor)).filter(Boolean);
+          if (dates.length > 0) {
+            const min = new Date(Math.min(...dates));
+            const max = new Date(Math.max(...dates));
+            dateRangeText = `${formatDateToIndo(min)} s.d. ${formatDateToIndo(max)}`;
+          }
+        }
+      }
 
       // Gather current filter selections to add context to prompt
       const kabEl = document.getElementById('filterKabupaten');
