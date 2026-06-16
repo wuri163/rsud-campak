@@ -1235,20 +1235,7 @@ function initCopyPromptButtons() {
       
       const dataJSON = getChartDataJSON(chartKey);
       
-      const promptText = `Anda adalah seorang Epidemiolog Senior dan Spesialis Surveilans Penyakit.
-Berikut adalah data ${chartName} dari Dashboard Surveilans Campak/Rubella berdasarkan Data Kunjungan Pasien RSUD Dr. Soedarso:
-
-Konteks Filter Aktif:
-- Rentang Tanggal: ${dateRangeText}
-- Kabupaten/Kota: ${kabText}
-
-Data (Format JSON):
-${JSON.stringify(dataJSON, null, 2)}
-
-Tugas Anda:
-1. Buatlah analisis deskriptif naratif dari data di atas (identifikasi tren, pola, puncak kasus, atau kelompok berisiko tinggi).
-2. Berikan interpretasi epidemiologis sesuai aspek Orang/Tempat/Waktu.
-3. Berikan rekomendasi intervensi kesehatan masyarakat berbasis bukti (Evidence-Based Decision Making).`;
+      const promptText = getChartPrompt(chartKey, chartName, dateRangeText, kabText, dataJSON);
 
       navigator.clipboard.writeText(promptText).then(() => {
         // Visual feedback
@@ -1271,6 +1258,197 @@ Tugas Anda:
       });
     });
   });
+}
+
+function getChartPrompt(chartKey, chartName, dateRangeText, kabText, dataJSON) {
+  const header = `Anda adalah seorang Epidemiolog Senior, Ahli Surveilans Penyakit Menular, dan Konsultan Program Imunisasi.
+
+Berikut adalah data ${chartName} dari Dashboard Surveilans Campak/Rubella berdasarkan Data Kunjungan Pasien RSUD Dr. Soedarso.
+
+Konteks:
+- Rentang Tanggal: ${dateRangeText}
+- Kabupaten/Kota: ${kabText}
+
+Data (Format JSON):
+${JSON.stringify(dataJSON, null, 2)}`;
+
+  const footer = `Sertakan angka absolut dan persentase pada setiap interpretasi. Jangan membuat asumsi di luar data yang tersedia. Nyatakan secara eksplisit apabila suatu kesimpulan memerlukan data tambahan.
+
+Tulis hasil dalam format laporan surveilans epidemiologi formal dengan bahasa teknis yang ringkas dan objektif.`;
+
+  const tasksByChart = {
+    epiCurve: `Tugas:
+
+1. Hitung total kasus keseluruhan dan total kasus per minggu epidemiologi beserta persentasenya terhadap total.
+
+2. Buat analisis deskriptif naratif yang mencakup:
+   - Minggu epidemiologi dengan kasus tertinggi dan terendah.
+   - Tren temporal kasus (meningkat, menurun, stabil, atau fluktuatif).
+   - Identifikasi puncak kasus (peak) dan kemungkinan gelombang epidemi.
+   - Perbandingan proporsi kasus berdasarkan klasifikasi (Confirmed Lab, Pending, Non-Measles) antar minggu.
+
+3. Lakukan interpretasi epidemiologis berdasarkan pendekatan Waktu:
+   - Analisis pola musiman atau periodisitas jika terlihat.
+   - Identifikasi periode kritis yang memerlukan respons cepat.
+   - Data ini hanya mencakup aspek WAKTU. Jika memerlukan analisis aspek Orang atau Tempat, jelaskan keterbatasannya.
+
+4. Berikan interpretasi programatik terkait:
+   - Kemungkinan masalah cakupan imunisasi berdasarkan tren kasus.
+   - Potensi risiko kejadian luar biasa (KLB) bila tren berlanjut.
+   - Evaluasi kecukupan respons surveilans terhadap kecepatan peningkatan kasus.
+
+5. Berikan rekomendasi Evidence-Based Decision Making yang mencakup:
+   - Surveilans (penguatan deteksi dini dan pelaporan).
+   - Imunisasi rutin dan imunisasi kejar (catch-up vaccination).
+   - Investigasi epidemiologi (kapan dan bagaimana).
+   - Komunikasi risiko kepada masyarakat dan tenaga kesehatan.
+   - Monitoring dan evaluasi respons.`,
+
+    kabupaten: `Tugas:
+
+1. Hitung total kasus keseluruhan dan total kasus per kabupaten/kota beserta persentasenya terhadap total.
+
+2. Buat analisis deskriptif naratif yang mencakup:
+   - Kabupaten/kota dengan kasus tertinggi dan terendah.
+   - Pola distribusi geografis kasus (terkonsentrasi atau menyebar).
+   - Kabupaten/kota yang paling berkontribusi terhadap beban penyakit.
+   - Identifikasi wilayah prioritas intervensi.
+
+3. Lakukan interpretasi epidemiologis berdasarkan pendekatan Tempat:
+   - Analisis disparitas geografis antar wilayah.
+   - Identifikasi kemungkinan faktor risiko berbasis lokasi.
+   - Data ini hanya mencakup aspek TEMPAT. Jika memerlukan analisis aspek Orang atau Waktu, jelaskan keterbatasannya.
+
+4. Berikan interpretasi programatik terkait:
+   - Kemungkinan masalah cakupan imunisasi di wilayah dengan kasus tinggi.
+   - Kelompok wilayah sasaran prioritas intervensi.
+   - Potensi risiko kejadian luar biasa (KLB) di wilayah tertentu.
+
+5. Berikan rekomendasi Evidence-Based Decision Making yang mencakup:
+   - Surveilans (penguatan di wilayah berisiko tinggi).
+   - Imunisasi rutin dan imunisasi kejar (catch-up vaccination) berbasis wilayah.
+   - Investigasi epidemiologi di wilayah dengan klaster kasus.
+   - Komunikasi risiko kepada masyarakat di wilayah terdampak.
+   - Monitoring dan evaluasi cakupan imunisasi per wilayah.`,
+
+    umur: `Tugas:
+
+1. Hitung total kasus dan persentase setiap kelompok umur terhadap total kasus.
+
+2. Buat analisis deskriptif naratif yang mencakup:
+   - Kelompok umur dengan kasus tertinggi dan terendah.
+   - Pola distribusi kasus menurut umur.
+   - Kelompok umur yang paling berkontribusi terhadap beban penyakit.
+   - Identifikasi kelompok rentan dan kemungkinan immunity gap.
+
+3. Lakukan interpretasi epidemiologis berdasarkan pendekatan Orang:
+   - Analisis kesesuaian distribusi umur dengan epidemiologi campak/rubella.
+   - Identifikasi apakah terdapat pergeseran umur kasus (age shift).
+   - Data ini hanya mencakup aspek ORANG (kelompok umur). Jika memerlukan analisis aspek Tempat atau Waktu, jelaskan keterbatasannya.
+   - Hindari membuat asumsi yang tidak didukung data.
+
+4. Berikan interpretasi programatik terkait:
+   - Kemungkinan masalah cakupan imunisasi berdasarkan kelompok umur terdampak.
+   - Kelompok sasaran prioritas intervensi.
+   - Potensi risiko kejadian luar biasa (KLB) bila tren berlanjut.
+
+5. Berikan rekomendasi Evidence-Based Decision Making yang mencakup:
+   - Surveilans (penguatan deteksi pada kelompok umur berisiko).
+   - Imunisasi rutin (evaluasi cakupan MCV1 dan MCV2).
+   - Imunisasi kejar (catch-up vaccination) untuk kelompok umur dengan gap.
+   - Investigasi epidemiologi.
+   - Komunikasi risiko.
+   - Monitoring dan evaluasi.`,
+
+    gender: `Tugas:
+
+1. Hitung total kasus dan persentase berdasarkan jenis kelamin.
+
+2. Buat analisis deskriptif naratif yang mencakup:
+   - Perbandingan jumlah kasus antara laki-laki dan perempuan.
+   - Rasio laki-laki terhadap perempuan (sex ratio).
+   - Apakah terdapat perbedaan signifikan antara kedua kelompok.
+
+3. Lakukan interpretasi epidemiologis berdasarkan pendekatan Orang:
+   - Analisis apakah distribusi jenis kelamin sesuai dengan pola epidemiologi campak/rubella yang umumnya tidak memiliki predileksi gender.
+   - Data ini hanya mencakup aspek ORANG (jenis kelamin). Jika memerlukan analisis aspek Tempat atau Waktu, jelaskan keterbatasannya.
+   - Hindari membuat asumsi yang tidak didukung data.
+
+4. Berikan interpretasi programatik terkait:
+   - Implikasi terhadap strategi imunisasi jika ditemukan disparitas gender.
+   - Pertimbangan akses pelayanan kesehatan berbasis gender.
+
+5. Berikan rekomendasi Evidence-Based Decision Making yang mencakup:
+   - Surveilans (pemantauan kesetaraan akses deteksi kasus).
+   - Imunisasi rutin (evaluasi cakupan berdasarkan gender jika data tersedia).
+   - Komunikasi risiko yang sensitif gender.
+   - Monitoring dan evaluasi.`,
+
+    klasifikasi: `Tugas:
+
+1. Hitung total kasus dan persentase setiap klasifikasi akhir terhadap total kasus.
+
+2. Buat analisis deskriptif naratif yang mencakup:
+   - Proporsi kasus Confirmed Lab, Pending, dan Non-Measles.
+   - Rasio kasus konfirmasi terhadap total suspek.
+   - Evaluasi tingkat konfirmasi laboratorium.
+   - Identifikasi potensi masalah pada kasus yang masih Pending.
+
+3. Lakukan interpretasi epidemiologis berdasarkan pendekatan Orang:
+   - Analisis kualitas surveilans berdasarkan proporsi konfirmasi laboratorium.
+   - Evaluasi apakah proporsi kasus Non-Measles mengindikasikan sensitivitas surveilans yang baik atau overreporting.
+   - Data ini hanya mencakup aspek ORANG (klasifikasi kasus). Jika memerlukan analisis aspek Tempat atau Waktu, jelaskan keterbatasannya.
+   - Hindari membuat asumsi yang tidak didukung data.
+
+4. Berikan interpretasi programatik terkait:
+   - Evaluasi kinerja sistem surveilans dan laboratorium.
+   - Implikasi terhadap estimasi beban penyakit campak/rubella yang sebenarnya.
+   - Potensi risiko KLB berdasarkan proporsi kasus terkonfirmasi.
+
+5. Berikan rekomendasi Evidence-Based Decision Making yang mencakup:
+   - Surveilans (peningkatan kelengkapan dan kecepatan pemeriksaan laboratorium).
+   - Investigasi epidemiologi terhadap kasus Pending.
+   - Penguatan jejaring laboratorium.
+   - Monitoring dan evaluasi kinerja surveilans.`,
+
+    imunisasi: `Tugas:
+
+1. Hitung total kasus dan persentase setiap status imunisasi MCV1 terhadap total kasus.
+
+2. Buat analisis deskriptif naratif yang mencakup:
+   - Proporsi kasus yang sudah mendapat MCV1, belum, tidak, dan tidak diketahui.
+   - Identifikasi besarnya immunity gap berdasarkan status imunisasi.
+   - Evaluasi efektivitas program imunisasi berdasarkan status imunisasi kasus.
+   - Identifikasi kelompok dengan risiko tertinggi berdasarkan status imunisasi.
+
+3. Lakukan interpretasi epidemiologis berdasarkan pendekatan Orang:
+   - Analisis kesesuaian status imunisasi kasus dengan target cakupan imunisasi nasional.
+   - Identifikasi implikasi terhadap herd immunity.
+   - Data ini hanya mencakup aspek ORANG (status imunisasi). Jika memerlukan analisis aspek Tempat atau Waktu, jelaskan keterbatasannya.
+   - Hindari membuat asumsi yang tidak didukung data.
+
+4. Berikan interpretasi programatik terkait:
+   - Evaluasi cakupan dan efektivitas program imunisasi MCV1.
+   - Identifikasi masalah dropout imunisasi dan missed opportunity.
+   - Kelompok sasaran prioritas untuk imunisasi kejar.
+   - Potensi risiko KLB berdasarkan besarnya populasi rentan.
+
+5. Berikan rekomendasi Evidence-Based Decision Making yang mencakup:
+   - Surveilans (penguatan pencatatan status imunisasi pada kasus suspek).
+   - Imunisasi rutin (evaluasi dan penguatan cakupan MCV1 dan MCV2).
+   - Imunisasi kejar (catch-up vaccination) untuk kelompok yang belum/tidak diimunisasi.
+   - Investigasi epidemiologi terhadap kasus dengan riwayat imunisasi lengkap.
+   - Komunikasi risiko tentang pentingnya imunisasi campak/rubella.
+   - Monitoring dan evaluasi cakupan imunisasi.`
+  };
+
+  const tasks = tasksByChart[chartKey] || tasksByChart.umur;
+
+  return `${header}
+
+${tasks}
+
+${footer}`;
 }
 
 function getChartDataJSON(chartKey) {
