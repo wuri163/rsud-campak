@@ -1029,3 +1029,100 @@ body::before {
   margin-bottom: var(--space-md);
   opacity: 0.5;
 }
+
+/* === Print Styles === */
+@media print {
+  body, html {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .sidebar,
+  .filter-panel,
+  .btn-copy-prompt,
+  .table-actions,
+  .pagination-controls,
+  .footer,
+  header .btn-primary,
+  .search-wrapper,
+  .page-btn {
+    display: none !important;
+  }
+
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .chart-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 30px !important;
+    padding: 20px !important;
+  }
+
+  .chart-title {
+    color: #0f172a !important;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+  }
+
+  .chart-title .title-text svg {
+    color: #0d9488 !important;
+  }
+
+  .charts-grid,
+  .charts-row-3 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+
+  .chart-container {
+    height: 350px !important;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 15px !important;
+    margin-bottom: 30px !important;
+  }
+
+  .kpi-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+  }
+
+  .kpi-title {
+    color: #475569 !important;
+  }
+
+  .card-value {
+    color: #0f172a !important;
+  }
+  
+  .table-section {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    page-break-before: always;
+  }
+  
+  .data-table th {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+  }
+
+  .data-table td {
+    color: #334155 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+}

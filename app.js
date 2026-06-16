@@ -441,9 +441,11 @@ function getChartDefaults() {
   };
 }
 
+Chart.register(ChartDataLabels);
 Chart.defaults.color = '#94a3b8';
 Chart.defaults.borderColor = 'rgba(148, 163, 184, 0.08)';
 Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.plugins.datalabels = { display: false };
 
 function destroyChart(name) {
   if (charts[name]) {
@@ -517,6 +519,14 @@ function renderEpiCurve() {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
+        datalabels: {
+          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          anchor: 'center',
+          align: 'center',
+          color: '#fff',
+          font: { weight: 'bold', size: 9 },
+          formatter: (v) => v
+        },
         legend: {
           position: 'top',
           labels: { boxWidth: 12, padding: 16, font: { size: 11, weight: '500' } }
@@ -598,6 +608,15 @@ function renderKabupatenChart() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
+        datalabels: {
+          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          anchor: 'end',
+          align: 'end',
+          color: '#cbd5e1',
+          font: { weight: 'bold', size: 10 },
+          offset: 4,
+          formatter: (v) => v
+        },
         legend: { display: false },
         tooltip: {
           backgroundColor: 'rgba(17, 24, 39, 0.95)',
@@ -663,6 +682,15 @@ function renderUmurChart() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
+        datalabels: {
+          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          anchor: 'end',
+          align: 'top',
+          color: '#cbd5e1',
+          font: { weight: 'bold', size: 10 },
+          offset: 2,
+          formatter: (v) => v
+        },
         legend: { display: false },
         tooltip: {
           backgroundColor: 'rgba(17, 24, 39, 0.95)',
@@ -713,6 +741,16 @@ function renderGenderChart() {
       maintainAspectRatio: false,
       cutout: '65%',
       plugins: {
+        datalabels: {
+          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          color: '#fff',
+          font: { weight: 'bold', size: 10 },
+          formatter: (value, ctx) => {
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            const pct = ((value / total) * 100).toFixed(0);
+            return `${value} (${pct}%)`;
+          }
+        },
         legend: {
           position: 'bottom',
           labels: { boxWidth: 12, padding: 16, font: { size: 12, weight: '500' } }
@@ -773,6 +811,16 @@ function renderKlasifikasiChart() {
       maintainAspectRatio: false,
       cutout: '60%',
       plugins: {
+        datalabels: {
+          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          color: '#fff',
+          font: { weight: 'bold', size: 10 },
+          formatter: (value, ctx) => {
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            const pct = ((value / total) * 100).toFixed(0);
+            return `${value} (${pct}%)`;
+          }
+        },
         legend: {
           position: 'bottom',
           labels: { boxWidth: 12, padding: 16, font: { size: 12, weight: '500' } }
@@ -841,6 +889,16 @@ function renderImunisasiChart() {
       maintainAspectRatio: false,
       cutout: '60%',
       plugins: {
+        datalabels: {
+          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          color: '#fff',
+          font: { weight: 'bold', size: 10 },
+          formatter: (value, ctx) => {
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            const pct = ((value / total) * 100).toFixed(0);
+            return `${value} (${pct}%)`;
+          }
+        },
         legend: {
           position: 'bottom',
           labels: { boxWidth: 12, padding: 16, font: { size: 12, weight: '500' } }
