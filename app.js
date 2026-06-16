@@ -423,6 +423,12 @@ function animateValue(id, target) {
   requestAnimationFrame(update);
 }
 
+function getAxisMaxWithPadding(maxValue, stepSize) {
+  if (maxValue === 0) return stepSize;
+  const currentMaxScale = Math.ceil(maxValue / stepSize) * stepSize;
+  return currentMaxScale + stepSize;
+}
+
 // === Chart Rendering ===
 function updateCharts() {
   renderEpiCurve();
@@ -484,6 +490,9 @@ function renderEpiCurve() {
 
   const keys = Object.keys(weekMap).sort();
   const labels = keys.map(k => weekMap[k].label);
+  
+  const maxWeeklyTotal = Math.max(...keys.map(k => weekMap[k].total), 0);
+  const maxScaleEpi = getAxisMaxWithPadding(maxWeeklyTotal, 5);
 
   const ctx = document.getElementById('chartEpiCurve').getContext('2d');
   charts.epiCurve = new Chart(ctx, {
@@ -561,6 +570,7 @@ function renderEpiCurve() {
         y: {
           stacked: true,
           beginAtZero: true,
+          max: maxScaleEpi,
           ticks: { stepSize: 5, font: { size: 10 } },
           title: { display: true, text: 'Jumlah Kasus', font: { size: 11, weight: '600' } }
         }
@@ -582,6 +592,9 @@ function renderKabupatenChart() {
   const sorted = Object.entries(countMap).sort((a, b) => b[1] - a[1]);
   const labels = sorted.map(s => s[0]);
   const data = sorted.map(s => s[1]);
+  
+  const maxKabTotal = data[0] || 0;
+  const maxScaleKab = getAxisMaxWithPadding(maxKabTotal, 10);
 
   const colors = [
     'rgba(20, 184, 166, 0.8)', 'rgba(59, 130, 246, 0.8)',
@@ -627,6 +640,7 @@ function renderKabupatenChart() {
       scales: {
         x: {
           beginAtZero: true,
+          max: maxScaleKab,
           ticks: { stepSize: 10, font: { size: 10 } },
           grid: { color: 'rgba(148, 163, 184, 0.05)' }
         },
@@ -660,6 +674,9 @@ function renderUmurChart() {
 
   const labels = Object.keys(groups);
   const data = Object.values(groups);
+  
+  const maxUmurTotal = Math.max(...data, 0);
+  const maxScaleUmur = getAxisMaxWithPadding(maxUmurTotal, 20);
 
   const ctx = document.getElementById('chartUmur').getContext('2d');
   charts.umur = new Chart(ctx, {
@@ -706,7 +723,8 @@ function renderUmurChart() {
         },
         y: {
           beginAtZero: true,
-          ticks: { stepSize: 10, font: { size: 10 } },
+          max: maxScaleUmur,
+          ticks: { stepSize: 20, font: { size: 10 } },
           title: { display: true, text: 'Jumlah', font: { size: 11, weight: '600' } }
         }
       }
