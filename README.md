@@ -88,7 +88,7 @@ Karena aplikasi melakukan panggilan jaringan (`fetch`) ke Google Sheets API, And
 ## 📊 Sumber Data & Integrasi Google Sheets
 
 Data dashboard diambil secara langsung dari publikasi Google Sheets dengan format URL ekspor berikut:
-`https://docs.google.com/spreadsheets/d/1VxWdlFTe3vuf69uDd2f2Y4YEsv8SBofmseTh5z_yj4k/gviz/tq?tqx=out:csv&gid=2035804887`
+`https://docs.google.com/spreadsheets/d/1VxWdlFTe3vu35804887`
 
 **Catatan Integrasi**:
 - Baris 0 hingga 9 dilewati (`DATA_START_ROW = 10`) karena berisi judul metadata formulir surveilans.
