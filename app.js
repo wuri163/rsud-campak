@@ -323,8 +323,8 @@ function getEpiWeekInfo(d) {
   return {
     weekNum,
     year,
-    label: `ME ${weekNum}/${year}`,
-    shortLabel: `ME ${weekNum}`,
+    label: `${year}-W${String(weekNum).padStart(2, '0')}`,
+    shortLabel: `W${String(weekNum).padStart(2, '0')}`,
     rangeText: `${formatDateIndo(dSunday)} s/d ${formatDateIndo(dSaturday)}`,
     sundayKey: toISODate(dSunday)
   };
